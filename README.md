@@ -1,7 +1,7 @@
 # homeassistant-ws
 
-![npm](https://img.shields.io/npm/v/homeassistant-ws?color=%23ff11dd&style=flat-square)
-![GitHub](https://img.shields.io/github/license/filp/homeassistant-ws?style=flat-square)
+[![npm](https://img.shields.io/npm/v/homeassistant-ws?color=%23ff11dd&style=flat-square)](https://www.npmjs.com/package/homeassistant-ws)
+[![GitHub](https://img.shields.io/github/license/filp/homeassistant-ws?style=flat-square)](https://github.com/filp/homeassistant-ws/blob/master/LICENSE.md)
 
 Minimalist client library for [Homeassistant's Websocket API](https://developers.home-assistant.io/docs/external_api_websocket). Works in node, and also in the browser.
 
