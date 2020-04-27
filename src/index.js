@@ -8,8 +8,8 @@ const defaultOptions = {
   path: '/api/websocket',
   token: null,
 
-  messageSerializer: fullMessage => JSON.stringify(fullMessage),
-  messageParser: fullMessage => JSON.parse(fullMessage.data),
+  messageSerializer: outgoingMessage => JSON.stringify(outgoingMessage),
+  messageParser: incomingMessage => JSON.parse(incomingMessage.data),
 
   // A method that returns a websocket instance. Can be overriden to use a custom behavior:
   ws (opts) {
