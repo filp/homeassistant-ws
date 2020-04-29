@@ -142,7 +142,7 @@ function clientObject (client) {
 async function connectAndAuthorize (client, resolveWith) {
   return new Promise((resolve, reject) => {
     client.ws.onmessage = messageHandler(client)
-    client.ws.onerror = err => reject(new Error(err))
+    client.ws.onerror = err => reject(err)
 
     client.emitter.on('auth_ok', () => resolve(resolveWith))
     client.emitter.on('auth_invalid', (msg) => reject(new Error(msg.message)))

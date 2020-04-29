@@ -1,20 +1,30 @@
 {
   "name": "homeassistant-ws",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "description": "Client for Homeassistant's websocket API",
-  "keywords": ["homeassistant", "websocket", "hass", "ha", "smart", "home", "api", "hassio"],
+  "keywords": [
+    "homeassistant",
+    "websocket",
+    "hass",
+    "ha",
+    "smart",
+    "home",
+    "api",
+    "hassio"
+  ],
   "homepage": "https://github.com/filp/homeassistant-ws",
   "main": "dist/index.js",
+  "types": "types.d.ts",
   "bugs": {
     "url": "https://github.com/filp/homeassistant-ws/issues"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/filp/homeassistant-ws.git"
-  },  
+  },
   "scripts": {
-    "start": "babel-node src/test.js",
+    "start": "babel-node src/index.js",
     "build": "babel src/ --out-dir=dist/",
     "prepublish": "npm run build"
   },
