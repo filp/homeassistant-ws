@@ -1,6 +1,6 @@
 {
   "name": "homeassistant-ws",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "description": "Client for Homeassistant's websocket API",
   "keywords": [

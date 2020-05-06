@@ -39,7 +39,7 @@ declare module "homeassistant-ws" {
     getConfig: () => Promise<Config>;
 
     onAnyEvent: (callback: EventCallback) => Promise<void>;
-    onStageChanged: (callback: EventCallback) => Promise<void>;
+    onStateChanged: (callback: EventCallback) => Promise<void>;
     onEvent: (eventName: string, callback: EventCallback) => Promise<void>;
     unsubscribeFromEvent: (eventName: string) => Promise<void>;
 
