@@ -1,6 +1,6 @@
 {
   "name": "homeassistant-ws",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "description": "Client for Homeassistant's websocket API",
   "keywords": [
@@ -29,10 +29,10 @@
     "prepare": "npm run build"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.0",
-    "@babel/node": "^7.8.7",
-    "@babel/preset-env": "^7.9.5",
+    "@babel/cli": "^7.13.10",
+    "@babel/core": "^7.13.10",
+    "@babel/node": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
     "standard": "^14.3.3"
   },
   "dependencies": {
