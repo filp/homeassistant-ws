@@ -14,7 +14,7 @@ declare module "homeassistant-ws" {
     port?: number;
     path?: string;
     token?: string;
-    
+
     messageSerializer: (outgoingMessage: WebsocketMessage) => string;
     messageParser: (incomingMessage: string) => WebsocketMessage;
 
@@ -27,7 +27,7 @@ declare module "homeassistant-ws" {
   }
 
   interface EventCallback {
-    (event: EventData): void
+    (event: EventData): void;
   }
 
   interface Client {
@@ -43,10 +43,18 @@ declare module "homeassistant-ws" {
     onEvent: (eventName: string, callback: EventCallback) => Promise<void>;
     unsubscribeFromEvent: (eventName: string) => Promise<void>;
 
-    callService: (domain: string, service: string, additionalArgs?: ServiceCallOptions) => Promise<Result>;
-    getMediaPlayerThumbnail: (entityId: EntityId) => Promise<BinaryContentResult>;
+    callService: (
+      domain: string,
+      service: string,
+      additionalArgs?: ServiceCallOptions
+    ) => Promise<Result>;
+    getMediaPlayerThumbnail: (
+      entityId: EntityId
+    ) => Promise<BinaryContentResult>;
     getCameraThumbnail: (entityId: EntityId) => Promise<BinaryContentResult>;
   }
 
-  export default function createClient (options: Config): Promise<Client>;
+  export default function createClient(
+    options: Partial<Config>
+  ): Promise<Client>;
 }
