@@ -14,7 +14,7 @@
     "hassio"
   ],
   "homepage": "https://github.com/filp/homeassistant-ws",
-  "main": "dist/index.js",
+  "main": "build/index.js",
   "bugs": {
     "url": "https://github.com/filp/homeassistant-ws/issues"
   },
