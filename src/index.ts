@@ -1,7 +1,7 @@
 import EventEmitter from 'events';
 import WebSocket from 'isomorphic-ws';
 
-type HassWsOptions = {
+export type HassWsOptions = {
   protocol: 'ws' | 'wss';
   host: string;
   port: number;
@@ -34,10 +34,10 @@ type HassCommandArgs = {
   [additionalArg: string]: any;
 };
 
-type EventListener = (...args: any[]) => void;
-type EventType = string | symbol;
+export type EventListener = (...args: any[]) => void;
+export type EventType = string | symbol;
 
-type HassApi = {
+export type HassApi = {
   rawClient: HassClient;
   getStates: () => Promise<any[]>;
   getServices: () => Promise<any[]>;
@@ -183,7 +183,7 @@ const clientObject = (client: HassClient): HassApi => {
 const connectAndAuthorize = async (
   client: HassClient,
   resolveWith: HassApi
-) => {
+): Promise<HassApi> => {
   return new Promise((resolve, reject) => {
     client.ws.onmessage = messageHandler(client);
 
@@ -229,7 +229,7 @@ const connectAndAuthorize = async (
 
 export default async function createClient(
   callerOptions: Partial<HassWsOptions> = {}
-) {
+): Promise<HassApi> {
   const options = {
     ...defaultOptions,
     ...callerOptions,
