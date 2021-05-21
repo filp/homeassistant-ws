@@ -186,16 +186,25 @@ const connectAndAuthorize = async (
 ) => {
   return new Promise((resolve, reject) => {
     client.ws.onmessage = messageHandler(client);
-    client.ws.onerror = (err: Error) => reject(err);
+
+    client.ws.onerror = (err: Error) => {
+      // Unlikely for a listener to exist at this stage, but just in case:
+      client.emitter.emit('ws_error', err);
+      reject(err);
+    };
+
+    // Pass-through onclose events to the client:
+    client.ws.onclose = (event: CloseEvent) =>
+      client.emitter.emit('ws_close', event);
 
     client.emitter.on('auth_ok', () => {
       // Immediately subscribe to all events, and return the client handle:
-      command({ type: 'subscribe_events' }, client).then(() =>
-        resolve(resolveWith)
-      );
+      command({ type: 'subscribe_events' }, client)
+        .then(() => resolve(resolveWith))
+        .catch((err) => reject(err));
     });
 
-    client.emitter.on('auth_invalid', (msg: Error) =>
+    client.emitter.on('auth_invalid', (msg: { message: string }) =>
       reject(new Error(msg.message))
     );
     client.emitter.on('auth_required', () => {
