@@ -23,6 +23,7 @@
     "url": "https://github.com/filp/homeassistant-ws.git"
   },
   "scripts": {
+    "build": "yarn prepare",
     "prepare": "tsc"
   },
   "devDependencies": {
