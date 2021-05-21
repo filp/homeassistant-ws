@@ -16,7 +16,6 @@ type HassClient = {
   seq: number;
   options: HassWsOptions;
   resultMap: { [resultId: number]: any };
-  eventListeners: { [eventType: string]: (event: Event) => void };
   emitter: EventEmitter;
   ws: WebSocket;
 };
@@ -24,6 +23,7 @@ type HassClient = {
 type HassCommandArgs = {
   type:
     | 'call_service'
+    | 'subscribe_events'
     | 'get_states'
     | 'get_services'
     | 'get_panels'
@@ -34,6 +34,9 @@ type HassCommandArgs = {
   [additionalArg: string]: any;
 };
 
+type EventListener = (...args: any[]) => void;
+type EventType = string | symbol;
+
 type HassApi = {
   rawClient: HassClient;
   getStates: () => Promise<any[]>;
@@ -43,6 +46,8 @@ type HassApi = {
 
   getMediaPlayerThumbnail: (entityId: string) => Promise<{}>;
   getCameraThumbnail: (entityId: string) => Promise<{}>;
+
+  on: (eventType: EventType, cb: EventListener) => void;
 
   callService: (
     domain: string,
@@ -69,10 +74,10 @@ const defaultOptions: Partial<HassWsOptions> = {
   },
 };
 
-async function command(
+const command = async (
   commandArgs: HassCommandArgs,
   client: HassClient
-): Promise<any> {
+): Promise<any> => {
   return new Promise((resolve, reject) => {
     const id = client.seq;
 
@@ -94,18 +99,21 @@ async function command(
     // Increment the shared message id sequence:
     client.seq++;
   });
-}
+};
 
-function binaryResultTransform(result: any) {
+const binaryResultTransform = (result: any) => {
   return {
     content_type: result.content_type,
     content: Buffer.from(result.content, 'base64'),
   };
-}
+};
 
-function messageHandler(client: HassClient) {
+const messageHandler = (client: HassClient) => {
   return (wsMessage: MessageEvent) => {
     const message = client.options.messageParser(wsMessage);
+
+    // Emit an event for any message under a main 'message' listener:
+    client.emitter.emit('message', message);
 
     // Emit an event for any message of any type:
     if (message.type) client.emitter.emit(message.type, message);
@@ -123,9 +131,9 @@ function messageHandler(client: HassClient) {
       }
     }
   };
-}
+};
 
-function clientObject(client: HassClient): HassApi {
+const clientObject = (client: HassClient): HassApi => {
   return {
     rawClient: client,
 
@@ -133,6 +141,10 @@ function clientObject(client: HassClient): HassApi {
     getServices: async () => command({ type: 'get_services' }, client),
     getPanels: async () => command({ type: 'get_panels' }, client),
     getConfig: async () => command({ type: 'get_config' }, client),
+
+    on: (eventId: EventType, cb: EventListener): void => {
+      client.emitter.on(eventId, cb);
+    },
 
     async callService(domain, service, additionalArgs = {}) {
       return command(
@@ -166,14 +178,23 @@ function clientObject(client: HassClient): HassApi {
       ).then(binaryResultTransform);
     },
   };
-}
+};
 
-async function connectAndAuthorize(client: HassClient, resolveWith: HassApi) {
+const connectAndAuthorize = async (
+  client: HassClient,
+  resolveWith: HassApi
+) => {
   return new Promise((resolve, reject) => {
     client.ws.onmessage = messageHandler(client);
     client.ws.onerror = (err: Error) => reject(err);
 
-    client.emitter.on('auth_ok', () => resolve(resolveWith));
+    client.emitter.on('auth_ok', () => {
+      // Immediately subscribe to all events, and return the client handle:
+      command({ type: 'subscribe_events' }, client).then(() =>
+        resolve(resolveWith)
+      );
+    });
+
     client.emitter.on('auth_invalid', (msg: Error) =>
       reject(new Error(msg.message))
     );
@@ -195,7 +216,7 @@ async function connectAndAuthorize(client: HassClient, resolveWith: HassApi) {
       );
     });
   });
-}
+};
 
 export default async function createClient(
   callerOptions: Partial<HassWsOptions> = {}
@@ -209,7 +230,6 @@ export default async function createClient(
     seq: 1,
     options,
     resultMap: {},
-    eventListeners: {},
     emitter: new (EventEmitter as any)(),
     ws: options.ws(options),
   };

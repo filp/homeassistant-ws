@@ -23,7 +23,7 @@
     "url": "https://github.com/filp/homeassistant-ws.git"
   },
   "scripts": {
-    "prepare": "tsc -b"
+    "prepare": "tsc"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
