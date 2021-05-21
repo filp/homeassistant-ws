@@ -1,6 +1,6 @@
 {
   "name": "homeassistant-ws",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "license": "MIT",
   "description": "Client for Homeassistant's websocket API",
   "keywords": [
@@ -15,7 +15,6 @@
   ],
   "homepage": "https://github.com/filp/homeassistant-ws",
   "main": "dist/index.js",
-  "types": "types.d.ts",
   "bugs": {
     "url": "https://github.com/filp/homeassistant-ws/issues"
   },
@@ -24,16 +23,13 @@
     "url": "https://github.com/filp/homeassistant-ws.git"
   },
   "scripts": {
-    "start": "babel-node src/index.js",
-    "build": "babel src/ --out-dir=dist/",
-    "prepare": "npm run build"
+    "prepare": "tsc -b"
   },
   "devDependencies": {
-    "@babel/cli": "^7.13.10",
-    "@babel/core": "^7.13.10",
-    "@babel/node": "^7.13.10",
-    "@babel/preset-env": "^7.13.10",
-    "standard": "^14.3.3"
+    "@types/events": "^3.0.0",
+    "@types/node": "^15.6.0",
+    "prettier": "^2.3.0",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "isomorphic-ws": "^4.0.1",
