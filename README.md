@@ -18,22 +18,21 @@ $ npm i --save homeassistant-ws
 Import it in your project:
 
 ```js
-import hass from 'homeassistant-ws'
+import hass from 'homeassistant-ws';
 
-async function main () {
+async function main() {
   // Assuming hass running in `localhost`, under the default `8321` port:
   const client = await hass({
-    token: 'my-secret-token'
-  })
+    token: 'my-secret-token',
+  });
 }
 ```
 
 Tokens are available from your profile page under the Homeassistant UI. For documentation on the authentication API, see [the official HA documentation](https://developers.home-assistant.io/docs/auth_api/).
 
-
 ## Configuration options
 
-The following properties (shown with their defaults) can be passed to the constructor. All are optional.
+The following properties (shown with their defaults) can be passed to the constructor. All are **optional**.
 
 ```js
 hass({
@@ -45,17 +44,19 @@ hass({
   // Must be set if HA expects authentication:
   token: null,
 
-  // Used to serialize outgoing messages: 
-  messageSerializer: outgoingMessage => JSON.stringify(outgoingMessage),
+  // Used to serialize outgoing messages:
+  messageSerializer: (outgoingMessage) => JSON.stringify(outgoingMessage),
 
   // Used to parse incoming messages. Receives the entire Websocket message object:
-  messageParser: incomingMessage => JSON.parse(incomingMessage.data),
+  messageParser: (incomingMessage) => JSON.parse(incomingMessage.data),
 
   // Should return a WebSocket instance
-  ws (opts) {
-    return new WebSocket(`${opts.protocol}://${opts.host}:${opts.port}${opts.path}`)
-  }
-})
+  ws: (opts) => {
+    return new WebSocket(
+      `${opts.protocol}://${opts.host}:${opts.port}${opts.path}`
+    );
+  },
+});
 ```
 
 ## Example
@@ -63,38 +64,44 @@ hass({
 The following example includes all available methods. For more details on available Homeassistant event types, states, etc. see the [official Websocket API](https://developers.home-assistant.io/docs/external_api_websocket)
 
 ```js
-import hass from 'hass'
+import hass from 'hass';
 
-async function main () {
+async function main() {
   // Establishes a connection, and authenticates if necessary:
-  const client = await hass({ token: 'my-token' })
+  const client = await hass({ token: 'my-token' });
 
   // Get a list of all available states, panels or services:
-  await client.getStates()
-  await client.getServices()
-  await client.getPanels()
+  await client.getStates();
+  await client.getServices();
+  await client.getPanels();
 
   // Get hass configuration:
-  await client.getConfig()
+  await client.getConfig();
 
   // Get a Buffer containing the current thumbnail for the given media player
-  await client.getMediaPlayerThumbnail('media_player.my_player')
+  await client.getMediaPlayerThumbnail('media_player.my_player');
   // { content_type: 'image/jpeg', content: Buffer<...>}
 
   // Get a Buffer containing a thumbnail for the given camera
-  await client.getCameraThumbnail('camera.front_yard')
+  await client.getCameraThumbnail('camera.front_yard');
   // { content_type: 'image/jpeg', content: Buffer<...>}
 
   // Call a service, by its domain and name. The third argument is optional.
-  await client.callService('lights', 'turn_on', { entity_id: 'light.my_light' })
+  await client.callService('lights', 'turn_on', {
+    entity_id: 'light.my_light',
+  });
 
-  // Register event handlers. Return a promise since we need to call the HA API to
-  // subscribe to events the first time.
-  await client.onAnyEvent((event) => console.log(event))
-  await client.onStateChanged((event) => console.log(event))
-  await client.onEvent('event_name', (event) => console.log(event))
+  // Listen for all HASS events - the 'message' event is a homeassistant-ws event triggered for
+  // all messages received through the websocket connection with HASS:
+  //
+  // See https://developers.home-assistant.io/docs/api/websocket/ for details on HASS events:
+  client.on('message', (rawMessageData) => {
+    console.log(rawMessageData);
+  });
 
-  // Tell HA to stop sending events of the following type:
-  await client.unsubscribeFromEvent('event_name')
+  // Listen only for state changes:
+  client.on('state_changed', (stateChangedEvent) => {
+    console.log(stateChangedEvent.data.new_state.state);
+  });
 }
 ```
