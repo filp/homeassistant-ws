@@ -52,7 +52,10 @@ export type HassApi = {
   callService: (
     domain: string,
     service: string,
-    extraArgs?: any
+    extraArgs?: any,
+    options?: {
+      returnResponse?: boolean;
+    }
   ) => Promise<any>;
 };
 
@@ -146,13 +149,21 @@ const clientObject = (client: HassClient): HassApi => {
       client.emitter.on(eventId, cb);
     },
 
-    async callService(domain, service, additionalArgs = {}) {
+    async callService(
+      domain,
+      service,
+      additionalArgs = {},
+      options = {
+        returnResponse: false,
+      }
+    ) {
       return command(
         {
           type: 'call_service',
           domain,
           service,
           service_data: additionalArgs,
+          return_response: options?.returnResponse,
         },
         client
       );
