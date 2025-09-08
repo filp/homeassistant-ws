@@ -47,6 +47,21 @@ export type HassApi = {
   getMediaPlayerThumbnail: (entityId: string) => Promise<{}>;
   getCameraThumbnail: (entityId: string) => Promise<{}>;
 
+  /**
+   * Allows calling arbitrary Hass WS commands, outside of the ones officially
+   * supported by homeassistant-ws.
+   *
+   * Returns a promise that resolves once a result is received.
+   *
+   * Refer to the HomeAssistant WebSocket API documentation for details on
+   * available commands.
+   */
+  command: typeof command;
+
+  /**
+   * Bind a listener on the internal event emitter used by homeassistant-ws. Can be
+   * used to set your own custom event handlers for HomeAssistant WebSocket API events.
+   */
   on: (eventType: EventType, cb: EventListener) => void;
 
   callService: (
@@ -139,6 +154,7 @@ const messageHandler = (client: HassClient) => {
 const clientObject = (client: HassClient): HassApi => {
   return {
     rawClient: client,
+    command: command,
 
     getStates: async () => command({ type: 'get_states' }, client),
     getServices: async () => command({ type: 'get_services' }, client),
