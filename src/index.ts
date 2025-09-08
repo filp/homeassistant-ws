@@ -21,16 +21,7 @@ type HassClient = {
 };
 
 type HassCommandArgs = {
-  type:
-    | 'call_service'
-    | 'subscribe_events'
-    | 'get_states'
-    | 'get_services'
-    | 'get_panels'
-    | 'get_config'
-    | 'media_player_thumbnail'
-    | 'camera_thumbnail';
-
+  type: string;
   [additionalArg: string]: any;
 };
 
@@ -56,7 +47,10 @@ export type HassApi = {
    * Refer to the HomeAssistant WebSocket API documentation for details on
    * available commands.
    */
-  command: typeof command;
+  command: (
+    commandType: string,
+    additionalArgs?: Record<string, unknown>
+  ) => Promise<any>;
 
   /**
    * Bind a listener on the internal event emitter used by homeassistant-ws. Can be
@@ -154,7 +148,19 @@ const messageHandler = (client: HassClient) => {
 const clientObject = (client: HassClient): HassApi => {
   return {
     rawClient: client,
-    command: command,
+
+    command: async (
+      commandType: string,
+      additionalArgs: Record<string, unknown> = {}
+    ) => {
+      return command(
+        {
+          type: commandType,
+          ...additionalArgs,
+        },
+        client
+      );
+    },
 
     getStates: async () => command({ type: 'get_states' }, client),
     getServices: async () => command({ type: 'get_services' }, client),
